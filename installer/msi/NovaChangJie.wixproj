@@ -1,0 +1,26 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+  <!--
+    dotnet build installer\msi\NovaChangJie.wixproj -c Release -p:StageDir=<dist> -p:ProductVersion=1.0.0
+    (build.ps1 -Msi does this for you.)
+  -->
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <ProductVersion Condition="'$(ProductVersion)' == ''">0.9.2</ProductVersion>
+    <StageDir Condition="'$(StageDir)' == ''">$(MSBuildThisFileDirectory)..\..\dist</StageDir>
+    <OutputName>NovaChangJie-$(ProductVersion)-x64</OutputName>
+    <!-- Optional parts, included when build.ps1 staged them. -->
+    <HasLm Condition="Exists('$(StageDir)\lm\NovaChangJieLM.exe') And Exists('$(StageDir)\lm\nova-lm.onnx')">1</HasLm>
+    <HasLm Condition="'$(HasLm)' == ''">0</HasLm>
+    <HasTextSources Condition="Exists('$(StageDir)\TEXT-SOURCES.md')">1</HasTextSources>
+    <HasTextSources Condition="'$(HasTextSources)' == ''">0</HasTextSources>
+    <HasUi Condition="Exists('$(StageDir)\ui\NovaChangJieSettingsUI.exe')">1</HasUi>
+    <HasUi Condition="'$(HasUi)' == ''">0</HasUi>
+    <DefineConstants>StageDir=$(StageDir);Version=$(ProductVersion);HasLm=$(HasLm);HasTextSources=$(HasTextSources);HasUi=$(HasUi);IconFile=$(MSBuildThisFileDirectory)..\..\src\tip\NovaChangJie.ico;LicenseRtf=$(MSBuildThisFileDirectory)License.rtf</DefineConstants>
+    <!-- Installer dialogs in English. -->
+    <Cultures>en-US</Cultures>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+  </ItemGroup>
+</Project>

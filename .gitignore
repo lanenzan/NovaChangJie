@@ -1,0 +1,15 @@
+/build/
+/dist/
+/out/
+/data/sources/
+*.user
+.vs/
+CMakeUserPresets.json
+__pycache__/
+/installer/msi/obj/
+/installer/msi/bin/
+# Downloaded or generated data (tools/fetch-data.ps1, prepare-corpus.py, train-lm.py)
+/data/corpus/
+/data/onnxruntime/
+/data/lm/
+/docs/icon-preview/

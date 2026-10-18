@@ -1,0 +1,18 @@
+namespace NovaSettings
+{
+    // One row of the word list.
+    runtimeclass WordItem
+    {
+        String Number { get; };
+        String Text { get; };
+        String Radicals { get; };
+        String Extra { get; };      // Shortcut (使用者造詞) or use count (常用新詞).
+        Int32 Index { get; };       // Position in the underlying word list.
+    }
+
+    [default_interface]
+    runtimeclass UserWordsWindow : Microsoft.UI.Xaml.Window
+    {
+        UserWordsWindow();
+    }
+}

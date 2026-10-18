@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  NovaChangJie MSI (WiX Toolset 5). Built by build.ps1 -Msi from the files
+  staged in dist\. Installs per machine into Program Files\NovaChangJie:
+
+    x64\NovaChangJie.dll   text service for 64-bit apps
+    x86\NovaChangJie.dll   text service for 32-bit apps
+    NovaChangJieSettings.exe, nova.dict, licences
+    lm\                    NovaChangJieLM helper (neural sentence scorer, ONNX
+                           Runtime and the model), started at logon; optional
+    ui\                    the WinUI settings app with the Windows App SDK
+                           runtime it carries; optional (NovaChangJieSettings.exe
+                           falls back to the classic windows)
+
+  Registration runs regsvr32 for each DLL (the DLL registers its COM class,
+  TSF profiles and categories itself). Optionally the keyboard is added to
+  the installing user's language list.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+  <Package Name="NovaChangJie Input Method"
+           Manufacturer="NovaChangJie contributors"
+           Version="$(var.Version)"
+           UpgradeCode="8AA75948-1F1C-427C-9BBA-528234546B3C"
+           Scope="perMachine"
+           Compressed="yes"
+           InstallerVersion="500">
+
+    <SummaryInformation Description="NovaChangJie - ChangJie (Cangjie) input method for Windows" />
+
+    <!-- AllowSameVersionUpgrades: a rebuilt MSI with the same version replaces
+         the installed copy instead of installing a second one beside it. -->
+    <MajorUpgrade AllowSameVersionUpgrades="yes"
+                  DowngradeErrorMessage="A newer version of [ProductName] is already installed."
+                  Schedule="afterInstallInitialize" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Launch Condition="VersionNT64" Message="NovaChangJie requires 64-bit Windows 10 or Windows 11." />
+
+    <Icon Id="NovaIcon.ico" SourceFile="$(var.IconFile)" />
+    <Property Id="ARPPRODUCTICON" Value="NovaIcon.ico" />
+
+    <!-- 1 = add the keyboard to the installing user's input list (zh-TW). -->
+    <Property Id="ADDKEYBOARD" Value="1" Secure="yes" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="NovaChangJie">
+        <Directory Id="X64DIR" Name="x64" />
+        <Directory Id="X86DIR" Name="x86" />
+        <Directory Id="LMDIR" Name="lm" />
+        <Directory Id="UIDIR" Name="ui" />
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder" />
+
+    <ComponentGroup Id="ProductFiles" Directory="INSTALLFOLDER">
+      <Component Id="Dictionary">
+        <File Id="NovaDict" Source="$(var.StageDir)\nova.dict" KeyPath="yes" />
+      </Component>
+      <Component Id="SettingsApp">
+        <File Id="SettingsExe" Source="$(var.StageDir)\NovaChangJieSettings.exe" KeyPath="yes">
+          <Shortcut Id="SettingsShortcut" Directory="ProgramMenuFolder"
+                    Name="NovaChangJie Settings" Description="NovaChangJie input method settings"
+                    Advertise="yes" Icon="NovaIcon.ico" WorkingDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="LicenseDoc">
+        <File Id="LicenseTxt" Source="$(var.StageDir)\LICENSE" Name="LICENSE.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="ReadmeDoc">
+        <File Id="ReadmeMd" Source="$(var.StageDir)\README.md" KeyPath="yes" />
+      </Component>
+      <Component Id="ReadmeZhDoc">
+        <File Id="ReadmeZhMd" Source="$(var.StageDir)\README.zh-TW.md" KeyPath="yes" />
+      </Component>
+      <Component Id="DataLicenseDoc">
+        <File Id="DataLicenses" Source="$(var.StageDir)\DATA-LICENSES.md" KeyPath="yes" />
+      </Component>
+      <?if $(var.HasTextSources) = 1 ?>
+      <Component Id="TextSourcesDoc">
+        <File Id="TextSources" Source="$(var.StageDir)\TEXT-SOURCES.md" KeyPath="yes" />
+      </Component>
+      <?endif?>
+      <?if $(var.HasUi) = 1 ?>
+      <Files Directory="UIDIR" Include="$(var.StageDir)\ui\**" />
+      <?endif?>
+      <?if $(var.HasLm) = 1 ?>
+      <Component Id="LmHelper" Directory="LMDIR" Bitness="always64">
+        <File Id="LmExe" Source="$(var.StageDir)\lm\NovaChangJieLM.exe" KeyPath="yes" />
+        <!-- Every user gets the helper at logon. -->
+        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="NovaChangJieLM"
+                       Type="string" Value="&quot;[#LmExe]&quot;" />
+      </Component>
+      <Component Id="LmRuntime" Directory="LMDIR" Bitness="always64">
+        <File Id="LmOrt" Source="$(var.StageDir)\lm\onnxruntime.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="LmModel" Directory="LMDIR" Bitness="always64">
+        <File Id="LmModelFile" Source="$(var.StageDir)\lm\nova-lm.onnx" KeyPath="yes" />
+      </Component>
+      <Component Id="LmVocab" Directory="LMDIR" Bitness="always64">
+        <File Id="LmVocabFile" Source="$(var.StageDir)\lm\nova-lm.vocab" KeyPath="yes" />
+      </Component>
+      <Component Id="LmOrtLicense" Directory="LMDIR" Bitness="always64">
+        <File Id="LmOrtLicenseFile" Source="$(var.StageDir)\lm\ONNXRUNTIME-LICENSE.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="LmOrtNotices" Directory="LMDIR" Bitness="always64">
+        <File Id="LmOrtNoticesFile" Source="$(var.StageDir)\lm\ONNXRUNTIME-ThirdPartyNotices.txt" KeyPath="yes" />
+      </Component>
+      <?endif?>
+      <Component Id="TipX64" Directory="X64DIR" Bitness="always64">
+        <File Id="TipX64Dll" Source="$(var.StageDir)\x64\NovaChangJie.dll" KeyPath="yes" />
+      </Component>
+      <!-- A plain file in the 64-bit install folder; the 32-bit regsvr32 below
+           registers it in the 32-bit registry view. -->
+      <Component Id="TipX86" Directory="X86DIR" Bitness="always64">
+        <File Id="TipX86Dll" Source="$(var.StageDir)\x86\NovaChangJie.dll" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <Feature Id="Main" Title="NovaChangJie" Level="1" AllowAbsent="no">
+      <ComponentGroupRef Id="ProductFiles" />
+    </Feature>
+
+    <!-- Register / unregister the text service (elevated, deferred). -->
+    <CustomAction Id="RegisterX64" Directory="INSTALLFOLDER" Execute="deferred" Impersonate="no" Return="check"
+                  ExeCommand="&quot;[System64Folder]regsvr32.exe&quot; /s &quot;[#TipX64Dll]&quot;" />
+    <CustomAction Id="RegisterX86" Directory="INSTALLFOLDER" Execute="deferred" Impersonate="no" Return="check"
+                  ExeCommand="&quot;[SystemFolder]regsvr32.exe&quot; /s &quot;[#TipX86Dll]&quot;" />
+    <CustomAction Id="RollbackX64" Directory="INSTALLFOLDER" Execute="rollback" Impersonate="no" Return="ignore"
+                  ExeCommand="&quot;[System64Folder]regsvr32.exe&quot; /s /u &quot;[#TipX64Dll]&quot;" />
+    <CustomAction Id="RollbackX86" Directory="INSTALLFOLDER" Execute="rollback" Impersonate="no" Return="ignore"
+                  ExeCommand="&quot;[SystemFolder]regsvr32.exe&quot; /s /u &quot;[#TipX86Dll]&quot;" />
+    <CustomAction Id="UnregisterX64" Directory="INSTALLFOLDER" Execute="deferred" Impersonate="no" Return="ignore"
+                  ExeCommand="&quot;[System64Folder]regsvr32.exe&quot; /s /u &quot;[#TipX64Dll]&quot;" />
+    <CustomAction Id="UnregisterX86" Directory="INSTALLFOLDER" Execute="deferred" Impersonate="no" Return="ignore"
+                  ExeCommand="&quot;[SystemFolder]regsvr32.exe&quot; /s /u &quot;[#TipX86Dll]&quot;" />
+
+    <!-- Per-user keyboard list (runs as the installing user; never fatal). -->
+    <CustomAction Id="AddKeyboard" FileRef="SettingsExe" ExeCommand="/add-keyboard" Execute="immediate"
+                  Impersonate="yes" Return="ignore" />
+    <!-- By path, not FileRef: a FileRef action fails with error 2753 when the
+         file is not part of the current transaction (e.g. a repair). -->
+    <CustomAction Id="RemoveKeyboard" Directory="INSTALLFOLDER" Execute="immediate" Impersonate="yes" Return="ignore"
+                  ExeCommand="&quot;[INSTALLFOLDER]NovaChangJieSettings.exe&quot; /remove-keyboard" />
+
+    <?if $(var.HasLm) = 1 ?>
+    <!-- Stop every running copy before its files are replaced or removed. It
+         starts again at logon, or when the input method first needs it (not
+         from here: the installer may be elevated, the helper must not be). -->
+    <CustomAction Id="StopLm" Directory="INSTALLFOLDER" Execute="deferred" Impersonate="no" Return="ignore"
+                  ExeCommand="&quot;[System64Folder]taskkill.exe&quot; /f /im NovaChangJieLM.exe" />
+    <!-- Also stop it before InstallValidate, so the files-in-use check does
+         not ask the user to close a helper that has no window. -->
+    <CustomAction Id="StopLmEarly" Directory="INSTALLFOLDER" Execute="immediate" Return="ignore"
+                  ExeCommand="&quot;[System64Folder]taskkill.exe&quot; /f /im NovaChangJieLM.exe" />
+    <?endif?>
+
+    <InstallExecuteSequence>
+      <?if $(var.HasLm) = 1 ?>
+      <Custom Action="StopLmEarly" Before="InstallValidate" />
+      <Custom Action="StopLm" Before="RemoveFiles" />
+      <?endif?>
+      <Custom Action="RemoveKeyboard" Before="InstallInitialize" Condition="Installed AND REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE" />
+      <Custom Action="UnregisterX86" Before="RemoveFiles" Condition="REMOVE~=&quot;ALL&quot;" />
+      <Custom Action="UnregisterX64" Before="UnregisterX86" Condition="REMOVE~=&quot;ALL&quot;" />
+      <Custom Action="RollbackX64" After="InstallFiles" Condition="NOT REMOVE" />
+      <Custom Action="RegisterX64" After="RollbackX64" Condition="NOT REMOVE" />
+      <Custom Action="RollbackX86" After="RegisterX64" Condition="NOT REMOVE" />
+      <Custom Action="RegisterX86" After="RollbackX86" Condition="NOT REMOVE" />
+      <Custom Action="AddKeyboard" After="InstallFinalize" Condition="NOT Installed AND ADDKEYBOARD = &quot;1&quot;" />
+    </InstallExecuteSequence>
+
+    <!-- Welcome, licence, progress, finish. -->
+    <ui:WixUI Id="WixUI_Minimal" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.LicenseRtf)" />
+  </Package>
+</Wix>

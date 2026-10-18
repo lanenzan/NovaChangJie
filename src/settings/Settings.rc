@@ -1,0 +1,223 @@
+#pragma code_page(65001)
+#include <winres.h>
+#include "resource.h"
+
+IDI_NOVA ICON "../tip/NovaChangJie.ico"
+
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
+
+// Property-sheet pages, laid out like the Windows 11 Microsoft ChangJie
+// settings: a section heading followed by an etched line (the line is
+// stretched to start right after the heading text at run time), an
+// explanation, then "label: [dropdown]" rows indented beneath it.
+
+#define PAGE_STYLE DS_SETFONT | DS_CONTROL | WS_CHILD | WS_DISABLED | WS_CAPTION
+#define HEADLINE(y) CONTROL "", -1, "Static", SS_ETCHEDHORZ, 60, y, 213, 1
+
+IDD_PAGE_GENERAL DIALOGEX 0, 0, 280, 272
+STYLE PAGE_STYLE
+CAPTION "一般"
+FONT 9, "Microsoft JhengHei UI", 400, 0, 0x88
+BEGIN
+    LTEXT           "一般設定:", -1, 7, 8, 60, 9
+    HEADLINE(13)
+    LTEXT           "選擇應用程式開啟時，輸入法的預設輸入模式。", -1, 16, 24, 256, 9
+    LTEXT           "預設輸入模式(&D):", -1, 30, 41, 82, 9
+    COMBOBOX        IDC_STARTMODE, 114, 39, 110, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "變更候選字窗的字型大小。", -1, 16, 60, 256, 9
+    LTEXT           "字型大小設定(&F):", -1, 30, 77, 82, 9
+    COMBOBOX        IDC_FONTSIZE, 114, 75, 110, 120, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    AUTOCHECKBOX    "提示相關字詞(&P)", IDC_ASSOC, 16, 98, 250, 10
+
+    LTEXT           "輸出設定:", -1, 7, 122, 60, 9
+    HEADLINE(127)
+    LTEXT           "選擇輸出字元集 (請確定已經安裝所需字型檔案)。", -1, 16, 138, 256, 9
+    LTEXT           "字元集設定(&C):", -1, 30, 155, 82, 9
+    COMBOBOX        IDC_CHARSET, 114, 153, 130, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    AUTOCHECKBOX    "輸出簡體中文(&S)", IDC_SIMPLIFIED, 16, 176, 250, 10
+END
+
+IDD_PAGE_ADVANCED DIALOGEX 0, 0, 280, 272
+STYLE PAGE_STYLE
+CAPTION "進階"
+FONT 9, "Microsoft JhengHei UI", 400, 0, 0x88
+BEGIN
+    LTEXT           "輸入設定:", -1, 7, 8, 60, 9
+    HEADLINE(13)
+    LTEXT           "選擇倉頡字根的版本。", -1, 16, 24, 256, 9
+    LTEXT           "倉頡版本(&V):", -1, 30, 41, 82, 9
+    COMBOBOX        IDC_VERSION, 114, 39, 110, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    AUTOCHECKBOX    "智慧選字：整句輸入，自動選字，Enter 送出(&M)", IDC_SENTENCE, 16, 58, 256, 10
+    AUTOCHECKBOX    "智慧選字時，輸入字根亦顯示候選字(&K)", IDC_CODECANDS, 28, 70, 244, 10
+    AUTOCHECKBOX    "預測：列出字根開頭相同的常用字(&R)", IDC_PREDICTION, 16, 82, 256, 10
+    AUTOCHECKBOX    "在預測字旁顯示其餘字根(&H)", IDC_HINTS, 28, 94, 244, 10
+    AUTOCHECKBOX    "只有一個候選字時自動上字(&U)", IDC_AUTOUNIQUE, 16, 106, 256, 10
+    AUTOCHECKBOX    "輸入第六個字根時自動送出首選字(&O)", IDC_OVERFLOW, 16, 118, 256, 10
+    AUTOCHECKBOX    "按 ` (多功能前導字元鍵) 時顯示可用功能(&G)", IDC_PREFIXHINTS, 16, 130, 256, 10
+
+    LTEXT           "候選字視窗:", -1, 7, 158, 60, 9
+    HEADLINE(163)
+    LTEXT           "排列方式(&L):", -1, 30, 175, 82, 9
+    COMBOBOX        IDC_LAYOUT, 114, 173, 110, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "每頁字數(&N):", -1, 30, 190, 82, 9
+    COMBOBOX        IDC_PAGESIZE, 114, 188, 110, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    AUTOCHECKBOX    "以英文字母顯示字根，例如 oiar 而不是 人戈口(&E)", IDC_LETTERS, 16, 207, 256, 10
+
+    LTEXT           "中英切換:", -1, 7, 224, 60, 9
+    HEADLINE(229)
+    AUTOCHECKBOX    "按 Shift 切換中／英(&T)", IDC_SHIFT, 16, 238, 256, 10
+    AUTOCHECKBOX    "預設全形 (Shift+Space 切換)(&A)", IDC_STARTFULL, 16, 250, 256, 10
+    AUTOCHECKBOX    "預設中文標點 (Ctrl+. 切換)(&I)", IDC_PUNCT, 16, 262, 256, 10
+END
+
+IDD_PAGE_DICTIONARY DIALOGEX 0, 0, 280, 272
+STYLE PAGE_STYLE
+CAPTION "辭典"
+FONT 9, "Microsoft JhengHei UI", 400, 0, 0x88
+BEGIN
+    LTEXT           "個人化調整:", -1, 7, 8, 60, 9
+    HEADLINE(13)
+    AUTOCHECKBOX    "啟用個人化調整：記住最近用過的字詞(&P)", IDC_LEARNING, 16, 24, 256, 10
+    AUTORADIOBUTTON "候選字順序固定 (傳統 Big5 次序)(&F)", IDC_ORDER_FIXED, 28, 40, 244, 10, WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "候選字順序依使用頻率調整(&C)", IDC_ORDER_FREQ, 28, 53, 244, 10
+    LTEXT           "清除所有學習記錄，候選字回復預設次序。", -1, 16, 74, 180, 9
+    PUSHBUTTON      "刪除(&D)", IDC_CLEARHISTORY, 210, 71, 62, 14, WS_GROUP
+
+    LTEXT           "使用者造詞:", -1, 7, 98, 60, 9
+    HEADLINE(103)
+    LTEXT           "新增或修改自建詞 (以記事本編輯 user_phrases.txt)。", -1, 16, 114, 256, 9
+    PUSHBUTTON      "使用者造詞(&V)…", IDC_EDITPHRASES, 30, 130, 90, 14
+
+    LTEXT           "智慧選字:", -1, 7, 154, 60, 9
+    HEADLINE(159)
+    AUTOCHECKBOX    "依前後詞語的接續機率選字(&B)", IDC_WORDPAIRS, 16, 170, 256, 10
+    AUTOCHECKBOX    "以神經網路語言模型再次比對 (背景程式 NovaChangJieLM)(&N)", IDC_NEURAL, 16, 182, 256, 10
+END
+
+// --- User words tool --------------------------------------------------------
+
+IDR_USERWORDS_MENU MENU
+BEGIN
+    POPUP "檔案(&F)"
+    BEGIN
+        MENUITEM "匯入(&I)…", ID_UW_IMPORT
+        MENUITEM "匯出(&E)…", ID_UW_EXPORT
+        MENUITEM SEPARATOR
+        MENUITEM "儲存(&S)\tCtrl+S", ID_UW_SAVE
+        MENUITEM SEPARATOR
+        MENUITEM "結束(&X)", ID_UW_EXIT
+    END
+    POPUP "編輯(&E)"
+    BEGIN
+        MENUITEM "復原刪除(&U)\tCtrl+Z", ID_UW_UNDELETE
+        MENUITEM SEPARATOR
+        MENUITEM "新增(&I)\tCtrl+I", ID_UW_INSERT
+        MENUITEM "刪除(&D)\tDel", ID_UW_DELETE
+        MENUITEM "修改(&M)…\tEnter", ID_UW_MODIFY
+        MENUITEM SEPARATOR
+        MENUITEM "移至使用者造詞(&V)", ID_UW_MOVE
+        MENUITEM SEPARATOR
+        MENUITEM "全選(&A)\tCtrl+A", ID_UW_SELECTALL
+        MENUITEM "尋找(&F)…\tCtrl+F", ID_UW_FIND
+    END
+    POPUP "檢視(&V)"
+    BEGIN
+        MENUITEM "使用者造詞(&U)", ID_UW_VIEW_USER
+        MENUITEM "常用新詞(&L)", ID_UW_VIEW_LEARNED
+        MENUITEM SEPARATOR
+        MENUITEM "依詞彙排序(&P)", ID_UW_SORT_PHRASE
+        MENUITEM "依字根排序(&R)", ID_UW_SORT_READING
+        MENUITEM "依捷徑排序(&K)", ID_UW_SORT_SHORTCUT
+        MENUITEM SEPARATOR
+        MENUITEM "工具列(&T)", ID_UW_VIEW_TOOLBAR
+        MENUITEM "狀態列(&S)", ID_UW_VIEW_STATUS
+    END
+    POPUP "說明(&H)"
+    BEGIN
+        MENUITEM "關於使用者造詞工具(&A)…", ID_UW_ABOUT
+    END
+END
+
+IDR_USERWORDS_ACCEL ACCELERATORS
+BEGIN
+    "S", ID_UW_SAVE, VIRTKEY, CONTROL
+    "Z", ID_UW_UNDELETE, VIRTKEY, CONTROL
+    "I", ID_UW_INSERT, VIRTKEY, CONTROL
+    VK_DELETE, ID_UW_DELETE, VIRTKEY
+    "A", ID_UW_SELECTALL, VIRTKEY, CONTROL
+    "F", ID_UW_FIND, VIRTKEY, CONTROL
+END
+
+IDD_WORD_EDIT DIALOGEX 0, 0, 252, 290
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "詞彙編輯"
+FONT 9, "Microsoft JhengHei UI", 400, 0, 0x88
+BEGIN
+    LTEXT           "若詞彙長度超過 9 個字元或含有無字根的字元，請指派捷徑鍵。反之可不指派捷徑鍵。\n捷徑鍵直接以字母輸入，例如: ""sck""。", -1, 7, 6, 238, 28
+    LTEXT           "詞彙(&P):", -1, 10, 46, 40, 9
+    EDITTEXT        IDC_WE_TEXT, 50, 44, 192, 40, ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL
+    LTEXT           "中文", -1, 10, 98, 20, 9
+    CTEXT           "字根", -1, 32, 98, 100, 9
+    LTEXT           "捷徑鍵(&S):", -1, 150, 98, 80, 9
+    EDITTEXT        IDC_WE_SHORTCUT, 150, 110, 92, 13, ES_LOWERCASE | ES_AUTOHSCROLL
+    CTEXT           "", IDC_WE_CHAR0+0, 10, 114, 18, 10
+    COMBOBOX        IDC_WE_CODE0+0, 32, 112, 100, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP | WS_DISABLED
+    CTEXT           "", IDC_WE_CHAR0+1, 10, 131, 18, 10
+    COMBOBOX        IDC_WE_CODE0+1, 32, 129, 100, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP | WS_DISABLED
+    CTEXT           "", IDC_WE_CHAR0+2, 10, 148, 18, 10
+    COMBOBOX        IDC_WE_CODE0+2, 32, 146, 100, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP | WS_DISABLED
+    CTEXT           "", IDC_WE_CHAR0+3, 10, 165, 18, 10
+    COMBOBOX        IDC_WE_CODE0+3, 32, 163, 100, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP | WS_DISABLED
+    CTEXT           "", IDC_WE_CHAR0+4, 10, 182, 18, 10
+    COMBOBOX        IDC_WE_CODE0+4, 32, 180, 100, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP | WS_DISABLED
+    CTEXT           "", IDC_WE_CHAR0+5, 10, 199, 18, 10
+    COMBOBOX        IDC_WE_CODE0+5, 32, 197, 100, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP | WS_DISABLED
+    CTEXT           "", IDC_WE_CHAR0+6, 10, 216, 18, 10
+    COMBOBOX        IDC_WE_CODE0+6, 32, 214, 100, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP | WS_DISABLED
+    CTEXT           "", IDC_WE_CHAR0+7, 10, 233, 18, 10
+    COMBOBOX        IDC_WE_CODE0+7, 32, 231, 100, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP | WS_DISABLED
+    CTEXT           "", IDC_WE_CHAR0+8, 10, 250, 18, 10
+    COMBOBOX        IDC_WE_CODE0+8, 32, 248, 100, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP | WS_DISABLED
+    DEFPUSHBUTTON   "確定", IDOK, 132, 270, 52, 14, WS_DISABLED
+    PUSHBUTTON      "取消", IDCANCEL, 190, 270, 52, 14
+END
+
+IDD_WORD_FIND DIALOGEX 0, 0, 220, 52
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "尋找"
+FONT 9, "Microsoft JhengHei UI", 400, 0, 0x88
+BEGIN
+    LTEXT           "尋找詞彙(&N):", -1, 7, 10, 50, 9
+    EDITTEXT        IDC_FIND_TEXT, 58, 8, 155, 13, ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "尋找下一個", IDOK, 105, 31, 52, 14
+    PUSHBUTTON      "取消", IDCANCEL, 161, 31, 52, 14
+END
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,9,2,0
+ PRODUCTVERSION 0,9,2,0
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+ FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040404b0"
+        BEGIN
+            VALUE "CompanyName", "NovaChangJie contributors"
+            VALUE "FileDescription", "NovaChangJie 星倉頡 設定"
+            VALUE "FileVersion", "0.9.2.0"
+            VALUE "InternalName", "NovaChangJieSettings.exe"
+            VALUE "LegalCopyright", "(c) 2026 NovaChangJie contributors, CC BY-NC-SA 4.0"
+            VALUE "OriginalFilename", "NovaChangJieSettings.exe"
+            VALUE "ProductName", "NovaChangJie"
+            VALUE "ProductVersion", "0.9.2.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x404, 1200
+    END
+END
